@@ -9,8 +9,6 @@ import java.io.*;
 
 @Slf4j
 public abstract class Tools {
-    static final String HOST = "https://www.kookmin.ac.kr";
-    static final String outputURI = "./src/output/";
 
     static String getLink(Element element) {
         String src = null;
@@ -19,7 +17,7 @@ public abstract class Tools {
             src = element.attr("src");
 //            log.info("img source = {}", src);
         } else if (element.is("a")){ // if <img> tag element -> get src value;
-            src = element.select("a").attr("href");
+            src = element.attr("href");
             src = src.replaceAll("\\?currentPageNo=.", "");
 //            log.info("file source = {}", src);
         } else {
@@ -37,7 +35,7 @@ public abstract class Tools {
 
     static Document readHtmlToDocument(String url) {
         try {
-            return Jsoup.parse(new File(url), "UTF-8", HOST);
+            return Jsoup.parse(new File(url), "UTF-8", Constants.HOST);
         } catch (IOException e) {
             log.error("Failed to read file: {}", url);
             throw new RuntimeException(e);

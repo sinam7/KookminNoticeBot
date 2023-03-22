@@ -1,13 +1,18 @@
 package com.sinam7.KookminNoticeBot;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.util.List;
 
-@SpringBootApplication
+//@SpringBootApplication
 public class KookminNoticeBotApplication {
 
+//	public static void main(String[] args) {
+//		SpringApplication.run(KookminNoticeBotApplication.class, args);
+//	}
+
 	public static void main(String[] args) {
-		SpringApplication.run(KookminNoticeBotApplication.class, args);
+		WebCrawler webCrawler = new WebCrawler();
+
+		List<Notice> recentNotices = webCrawler.getRecentNotices();
 	}
 
 }

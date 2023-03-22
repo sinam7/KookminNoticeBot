@@ -38,3 +38,4 @@ out/
 
 /src/output/
 /src/test/
+/src/**/Constants.java

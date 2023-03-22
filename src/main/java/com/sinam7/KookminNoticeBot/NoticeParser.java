@@ -8,6 +8,8 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.sinam7.KookminNoticeBot.Constants.*;
+
 @Slf4j
 public abstract class NoticeParser {
 
@@ -24,7 +26,7 @@ public abstract class NoticeParser {
     }
 
     private static String getContent(Document document, StringBuilder sb) {
-        Elements noticeElements = document.body().select("div.view_inner > p");
+        Elements noticeElements = document.body().select(cssQuery_NoticeContent);
         for (Element element : noticeElements) {
             String text = element.text();
             if (text.isEmpty()) continue;
@@ -34,15 +36,14 @@ public abstract class NoticeParser {
         return Tools.trimLastNewline(sb);
     }
 
-
     private static String getTitle(Document document) {
-        Elements title = document.body().select("p.view_tit");
-        log.info("title = {}", title);
+        Elements title = document.body().select(cssQuery_NoticeTitle);
+        log.info("title = {}", title.text());
         return title.text();
     }
 
     private static List<String> getAttachedFile(Document document) {
-        Elements attached = document.body().select("a[href^=https://kep.kookmin.ac.kr/com/cmsv/FileCtr/fileDefaultDownload.do?]");
+        Elements attached = document.body().select(cssQuery_FileDownloadURL);
 //        log.info("attached = {}", attached);
         ArrayList<String> result = new ArrayList<>();
         for (Element element : attached) {
@@ -52,7 +53,7 @@ public abstract class NoticeParser {
     }
 
     private static List<String> getImageFile(Document document) {
-        Elements imgs = document.body().select("img[src^=https://kep.kookmin.ac.kr/com/cmsv/FileCtr/findUploadImg.do?]");
+        Elements imgs = document.body().select(cssQuery_ImageDownloadURL);
 //        log.info("imgs = {}", imgs);
         ArrayList<String> result = new ArrayList<>();
         for (Element element : imgs) {
@@ -62,7 +63,7 @@ public abstract class NoticeParser {
     }
 
     private static String getMetaData(Document document) {
-        Elements etc = document.body().select("div.board_etc > span");
+        Elements etc = document.body().select(cssQuery_NoticeMetaData);
 //        log.info("etc = {}", etc);
         StringBuilder sb = new StringBuilder();
         for (Element element : etc) {

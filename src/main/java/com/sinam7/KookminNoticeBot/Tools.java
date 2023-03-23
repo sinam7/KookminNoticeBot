@@ -1,11 +1,13 @@
 package com.sinam7.KookminNoticeBot;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 public abstract class Tools {
@@ -16,7 +18,7 @@ public abstract class Tools {
         if (element.is("img")) { // If not an <img> tag element -> get href value
             src = element.attr("src");
 //            log.info("img source = {}", src);
-        } else if (element.is("a")){ // if <img> tag element -> get src value;
+        } else if (element.is("a")) { // if <img> tag element -> get src value;
             src = element.attr("href");
             src = src.replaceAll("\\?currentPageNo=.", "");
 //            log.info("file source = {}", src);
@@ -68,5 +70,19 @@ public abstract class Tools {
         }
 
         return last;
+    }
+
+    public static void writeStringToFile(String src, String directoryPath, String fileNameWithExtension) {
+        try {
+            log.info("Downloading file {}", fileNameWithExtension);
+            FileUtils.writeStringToFile(new File(directoryPath + fileNameWithExtension),
+                    src, StandardCharsets.UTF_8);
+            log.info("Document downloaded Successfully in {}", directoryPath + fileNameWithExtension);
+        } catch (IOException e) {
+            log.error("Document downloaded Failed: {} - {}", fileNameWithExtension, e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+
     }
 }

@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public abstract class Tools {
 
-    static String getLink(Element element) {
+    public static String getLink(Element element) {
         String src = null;
 //        log.info("getLink() element = {}", element);
         if (element.is("img")) { // If not an <img> tag element -> get href value
@@ -28,14 +28,14 @@ public abstract class Tools {
         return src;
     }
 
-    static String trimLastNewline(StringBuilder sb) {
+    public static String trimLastNewline(StringBuilder sb) {
         if (sb.length() >= 1 && sb.substring(sb.length() - 1).equals("\n"))
             return sb.substring(0, sb.length() - 1);
         if (sb.isEmpty()) return "";
         return sb.toString();
     }
 
-    static Document readHtmlToDocument(String url) {
+    public static Document readHtmlToDocument(String url) {
         try {
             return Jsoup.parse(new File(url), "UTF-8", Constants.HOST);
         } catch (IOException e) {
@@ -44,13 +44,13 @@ public abstract class Tools {
         }
     }
 
-    static String validateEscapeChar(String title) {
+    public static String validateEscapeChar(String title) {
         return title.replace("/", ".")
                 .replace("\\", ".");
 
     }
 
-    static String getLastLine(File fileName) {
+    public static String getLastLine(File fileName) {
         BufferedReader input;
         try {
             input = new BufferedReader(new FileReader(fileName));
@@ -82,7 +82,6 @@ public abstract class Tools {
             log.error("Document downloaded Failed: {} - {}", fileNameWithExtension, e.getMessage());
             throw new RuntimeException(e);
         }
-
 
     }
 }

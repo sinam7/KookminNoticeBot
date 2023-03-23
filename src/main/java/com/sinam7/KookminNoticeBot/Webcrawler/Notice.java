@@ -1,4 +1,4 @@
-package com.sinam7.KookminNoticeBot;
+package com.sinam7.KookminNoticeBot.Webcrawler;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;

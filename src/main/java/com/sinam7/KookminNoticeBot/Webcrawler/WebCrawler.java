@@ -1,5 +1,6 @@
-package com.sinam7.KookminNoticeBot;
+package com.sinam7.KookminNoticeBot.Webcrawler;
 
+import com.sinam7.KookminNoticeBot.Tools;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;

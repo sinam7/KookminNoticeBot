@@ -24,6 +24,8 @@ public class Notice {
         @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection"})
         private List<String> attachedFiles;
 
+        public NoticeBuilder() {}
+
         public NoticeBuilder attachedFiles(List<String> urlList) {
             if (attachedFiles == null) attachedFiles = new ArrayList<>();
             for (String url : urlList) {
@@ -33,7 +35,7 @@ public class Notice {
         }
     }
 
-    public String toFileString() {
+    public String toStringForFile() {
         return title +
                 "\n=================\n" +
                 metadata +

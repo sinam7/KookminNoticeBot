@@ -11,6 +11,8 @@ import org.jsoup.select.Elements;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -25,7 +27,7 @@ import static org.jsoup.Connection.Response;
 public class WebCrawler {
     final HashSet<String> alreadyDownloaded = getAlreadyDownloadedDocumentsURI();
 
-    public List<Notice> getRecentNotices() {
+    public List<Notice> run() {
 
         List<Element> noticeElements = getNoticeElementList();
         List<Notice> noticeList = new ArrayList<>();
@@ -43,6 +45,7 @@ public class WebCrawler {
 
             noticeList.add(notice);
             downloadDocument(notice);
+            downloadFilesFromRecentNotices(noticeList);
         }
 
         return noticeList;
@@ -65,10 +68,14 @@ public class WebCrawler {
     private static HashSet<String> getAlreadyDownloadedDocumentsURI() {
         final HashSet<String> alreadyDownloaded = new HashSet<>();
         final File folder = new File(outputURI);
-        // get all files in the folder excluding sub-folders
-        final File[] fileList = Objects.requireNonNull(folder.listFiles(File::isFile));
-        for (File file : fileList) {
-            alreadyDownloaded.add(getLastLine(file).replaceAll("view\\.do.*", "view.do"));
+        // get all sub-folders in the folder excluding files
+        final File[] dirList = Objects.requireNonNull(folder.listFiles(File::isDirectory));
+        for (File dir : dirList) {
+            File[] files = dir.listFiles(File::isFile);
+            if (files == null) continue;
+            for (File file : files) {
+                alreadyDownloaded.add(getLastLine(file).replaceAll("view\\.do.*", "view.do"));
+            }
         }
         return alreadyDownloaded;
     }
@@ -99,13 +106,44 @@ public class WebCrawler {
     public static void downloadDocument(Notice notice) {
         try {
             log.info("Downloading file {}", Tools.validateEscapeChar(notice.getTitle()) + ".txt");
-            FileUtils.writeStringToFile(new File(outputURI +
-                    Tools.validateEscapeChar(notice.getTitle()) +".txt"), notice.toFileString(), StandardCharsets.UTF_8);    log.info("Document downloaded Successfully");
+            String fileName = validateEscapeChar(notice.getTitle());
+            String pathname = outputURI + fileName;
+            File dir = new File(pathname);
+            if (!dir.exists()) {
+                log.info("Directory for document is not exist; create directory at {}", dir.getPath());
+                Files.createDirectories(Path.of(pathname));
+            }
+            FileUtils.writeStringToFile(new File(pathname + "/" + fileName + ".txt"), notice.toStringForFile(), StandardCharsets.UTF_8);
+            log.info("Document downloaded Successfully");
         } catch (IOException e) {
             log.error("Document downloaded Failed - {}", e.getMessage());
             throw new RuntimeException(e);
         }
 
 
+    }
+
+    public static void downloadFilesFromRecentNotices(List<Notice> recentNotices) {
+        for (Notice recentNotice : recentNotices) {
+            String noticePath = outputURI + validateEscapeChar(recentNotice.getTitle());
+            List<String> attachedFiles = recentNotice.getAttachedFiles();
+            int idx = 1; String fileName = "";
+            for (String attachedFile : attachedFiles) {
+                int beginIndex = 0;
+                if (attachedFile.startsWith("IMAGE:")) {
+                    beginIndex = 6;
+                    fileName = "IMAGE" + idx + ".png";
+                } else if (attachedFile.startsWith("FILE:")) {
+                    beginIndex = 5;
+                    fileName = "FILE" + idx + ".pdf"; // TODO: 2023-03-29 다운로드받는 파일 확장자명 어떻게 확인?
+                }
+
+                String url = attachedFile.substring(beginIndex);
+                FileDownloader downloader = new FileDownloader();
+                String absolutePathWithFileNameAndExtension = new File(noticePath).getAbsolutePath() + File.separator + fileName;
+                downloader.run(url, absolutePathWithFileNameAndExtension);
+            }
+
+        }
     }
 }
